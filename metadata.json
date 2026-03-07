@@ -1,0 +1,5 @@
+{
+  "name": "Consent-Based Location Demo",
+  "description": "A demonstration of how to securely and ethically request user location using the HTML5 Geolocation API.",
+  "requestFramePermissions": ["geolocation"]
+}
