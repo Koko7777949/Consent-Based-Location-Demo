@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Navigation, AlertCircle, Loader2, ShieldCheck, Send, Clock, MessageSquare, Search } from 'lucide-react';
+import { MapPin, Navigation, AlertCircle, Loader2, ShieldCheck, Send, Clock, MessageSquare, Search, Menu, X } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -35,6 +35,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
 
   const defaultCenter: [number, number] = [20, 0];
   const defaultZoom = 2;
@@ -68,6 +69,9 @@ export default function App() {
         const timeStr = now.toLocaleTimeString();
         const msg = `Location as of ${timeStr}:\n${foundAddress ? foundAddress + '\n' : ''}${mapsLink}`;
         setMessageBody(msg);
+        
+        // Auto-hide panel to show the map after a brief delay
+        setTimeout(() => setIsPanelOpen(false), 800);
       } else {
         setError('No results found for that search.');
       }
@@ -126,6 +130,9 @@ export default function App() {
           const timeStr = now.toLocaleTimeString();
           const msg = `My current location as of ${timeStr}:\n${foundAddress ? foundAddress + '\n' : ''}${mapsLink}`;
           setMessageBody(msg);
+          
+          // Auto-hide panel to show the map after a brief delay
+          setTimeout(() => setIsPanelOpen(false), 800);
         }
       },
       (err) => {
@@ -183,14 +190,32 @@ export default function App() {
         </MapContainer>
       </div>
 
+      {/* Open Panel Button */}
+      <button
+        onClick={() => setIsPanelOpen(true)}
+        className={`absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl shadow-xl border border-slate-200/50 text-slate-700 hover:bg-white transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${isPanelOpen ? 'opacity-0 pointer-events-none -translate-x-8' : 'opacity-100 translate-x-0'}`}
+        aria-label="Open Menu"
+      >
+        <Menu className="w-6 h-6" />
+      </button>
+
       {/* Floating UI Panel */}
-      <div className="absolute top-4 left-4 z-10 w-[400px] max-w-[calc(100vw-2rem)] bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl flex flex-col max-h-[calc(100vh-2rem)] border border-slate-200/50">
+      <div className={`absolute top-4 left-4 z-20 w-[400px] max-w-[calc(100vw-2rem)] bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl flex flex-col max-h-[calc(100vh-2rem)] border border-slate-200/50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${isPanelOpen ? 'translate-x-0 opacity-100' : '-translate-x-[120%] opacity-0 pointer-events-none'}`}>
         <div className="p-6 overflow-y-auto custom-scrollbar">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center shrink-0">
-              <MapPin className="w-5 h-5 text-indigo-600" />
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center shrink-0">
+                <MapPin className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h1 className="text-xl font-semibold tracking-tight">Location Services</h1>
             </div>
-            <h1 className="text-xl font-semibold tracking-tight">Location Services</h1>
+            <button 
+              onClick={() => setIsPanelOpen(false)}
+              className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+              aria-label="Close Menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
           
           <div className="bg-slate-50/80 rounded-xl p-3 mb-6 border border-slate-100 flex items-start gap-3">
